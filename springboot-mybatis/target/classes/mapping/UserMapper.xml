@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springbootmybatis.mapper.UserMapper">
+	<!-- 添加，注册用户 -->
+	<insert id="addUser" parameterType="com.springbootmybatis.entity.User">
+		insert into user(userId,loginId,userName,email,userPwd,gender,age,address,contact,description,remainingBooks,birthday) values (#{userId},#{loginId},#{userName},#{email},#{userPwd},#{gender},#{age},#{address},#{contact},#{description},#{remainingBooks},#{birthday})
+	</insert>
+	
+	<!-- 更改用户信息 -->
+	<update id="updateUser"  parameterType="com.springbootmybatis.entity.User">
+		update user set userName=#{userName}, email=#{email},age=#{age},gender=#{gender},contact=#{contact},address=#{address},birthday=#{birthday},description=#{description} where loginId=#{loginId}
+	</update>
+	
+	<!-- 更改密码 -->
+	<update id="updatePassword" parameterType="com.springbootmybatis.entity.User">
+		update user set userPwd=#{userPwd} where loginId=#{loginId}
+	</update>
+	
+	<!-- 用户名验证 -->
+	<select id="nameExists" resultType="com.springbootmybatis.entity.User" parameterType="com.springbootmybatis.entity.User">
+		select * from user where loginId=#{loginId}
+	</select>
+	
+	<!-- 显示单个用户信息 -->
+	<select id="showUser" resultType="com.springbootmybatis.entity.User" parameterType="com.springbootmybatis.entity.User">
+		select * from user where loginId=#{loginId}
+	</select>
+	
+	<!-- 用户登陆验证 -->
+	<select id="loginUser" resultType="com.springbootmybatis.entity.User" parameterType="com.springbootmybatis.entity.User">
+		select * from user where loginId=#{loginId} AND userPwd=#{userPwd}
+	</select>
+	
+	<!-- 查询所有User -->
+	<select id="findAllUsers"  resultType="com.springbootmybatis.entity.User">
+		select * from user where 1=1 
+		<if test="userPrimaryKey!=null">
+            	and userName like concat ('%',#{userPrimaryKey},'%')
+            	or loginId like concat ('%',#{userPrimaryKey},'%')
+            	or gender like concat ('%',#{userPrimaryKey},'%')
+            	or age like concat ('%',#{userPrimaryKey},'%')
+            	or contact like concat ('%',#{userPrimaryKey},'%')
+        </if>
+	</select>
+	
+	<!-- 删除User -->
+	<delete id="deleteUser">
+		DELETE FROM user WHERE userId=#{userId}
+	</delete>
+	
+	<!-- 查询用户数量 -->
+	<select id="getUsersCount" resultType="Integer">
+		select count(*) from user where 1=1 
+		<if test="userPrimaryKey!=null">
+            	and userName like concat ('%',#{userPrimaryKey},'%')
+            	or loginId like concat ('%',#{userPrimaryKey},'%')
+            	or gender like concat ('%',#{userPrimaryKey},'%')
+            	or age like concat ('%',#{userPrimaryKey},'%')
+            	or contact like concat ('%',#{userPrimaryKey},'%')
+        </if>
+	</select>
+	
+	<!-- 更新用户借阅权限 -->
+	<update id="decreaseRemainingBooks">
+		update user set remainingBooks = remainingBooks - 1 where userId = #{uid}
+	</update>
+	
+	<!-- 更新用户借阅权限 -->
+	<update id="increaceRemainingBooks">
+		update user set remainingBooks = remainingBooks + 1 where userId = #{uid}
+	</update>
+</mapper>

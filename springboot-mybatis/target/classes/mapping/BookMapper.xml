@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springbootmybatis.mapper.BookMapper">
+	
+	<insert id="addBook" parameterType="com.springbootmybatis.entity.Book">
+		INSERT INTO book(bookId,bookName,bookType,bookTheme,author,inboundTime,inboundCount,
+		remainCount,borrowCount,description) VALUES (#{bookId},#{bookName},#{bookType},#{bookTheme},#{author}
+		,#{inboundTime},#{inboundCount},#{remainCount},#{borrowCount},#{description})
+	</insert>
+	
+	<delete id="deleteBookById">
+		DELETE FROM book WHERE bookId=#{bookId}
+	</delete>
+	
+	<update id="updateBookById"	 parameterType="com.springbootmybatis.entity.Book">
+		UPDATE book 
+		SET bookName=#{bookName},bookType=#{bookType},bookTheme=#{bookTheme},
+		author=#{author},inboundCount=#{inboundCount},remainCount=#{remainCount},borrowCount=#{borrowCount},description=#{description}
+		WHERE bookId=#{bookId}
+	</update>
+
+	
+	
+	<select id="findBookById" resultType="com.springbootmybatis.entity.Book">
+		SELECT * FROM book WHERE bookId=#{bookId}
+	</select>
+	
+	<!-- 查询书本数量 -->
+	<select id="getBooksCount" resultType="Integer">
+		select count(*) from book where 1=1
+		<if test="bookType!=null">
+            	and bookType like concat ('%',#{bookType},'%')
+        </if>
+        <if test="bookTheme!=null">
+            	and bookTheme like concat ('%',#{bookTheme},'%')
+        </if>
+        <if test="author!=null">
+            	and author like concat ('%',#{author},'%')
+        </if>
+	</select>
+	
+	<!-- 根据类型，主题，作者模糊查询书籍 -->
+	<select id="getBooksLike" resultType="com.springbootmybatis.entity.Book">
+		select * from book where 1=1
+		<if test="bookType!=null">
+            	and bookType like concat ('%',#{bookType},'%')
+        </if>
+        <if test="bookTheme!=null">
+            	and bookTheme like concat ('%',#{bookTheme},'%')
+        </if>
+        <if test="author!=null">
+            	and author like concat ('%',#{author},'%')
+        </if>
+	</select>
+	
+	<select id="getAllBooks" resultType="com.springbootmybatis.entity.Book">
+		SELECT * FROM book where 1=1
+		<if test="bookPrimaryKey!=null">
+            	and bookName like concat ('%',#{bookPrimaryKey},'%')
+            	or bookType like concat ('%',#{bookPrimaryKey},'%')
+            	or bookTheme like concat ('%',#{bookPrimaryKey},'%')
+            	or author like concat ('%',#{bookPrimaryKey},'%')
+        </if>
+	</select>
+	
+	<!-- 查询书本数量 -->
+	<select id="searchBooksCount" resultType="Integer">
+		select count(*) from book where 1=1
+		<if test="bookPrimaryKey!=null">
+            	and bookName like concat ('%',#{bookPrimaryKey},'%')
+            	or bookType like concat ('%',#{bookPrimaryKey},'%')
+            	or bookTheme like concat ('%',#{bookPrimaryKey},'%')
+            	or author like concat ('%',#{bookPrimaryKey},'%')
+        </if>
+	</select>
+	
+	<!-- 得到下拉框 -->
+	<!-- 获得书的所有类型 -->
+	<select id="getBooksTypes" resultType="String">
+		select distinct bookType from book 
+	</select>
+	
+	<!-- 获得书的所有主题 -->
+	<select id="getBooksThemes" resultType="String">
+		select distinct bookTheme from book 
+	</select>
+	
+	<!-- 获得书的所有作者 -->
+	<select id="getAuthors" resultType="String">
+		select distinct author from book 
+	</select>
+	
+	<!-- 根据书名和作者查找书本数量 -->
+	<select id="getBooksCountByBookNameAndAuthor" resultType="Integer">
+		select count(*) from book where bookName=#{bookName} and author=#{author}
+	</select>
+
+</mapper>

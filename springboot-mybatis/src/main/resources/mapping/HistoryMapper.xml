@@ -1,0 +1,100 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springbootmybatis.mapper.HistoryMapper">
+
+	<select id="findHistories" resultType="com.springbootmybatis.entity.History">
+		select h.*, b.*   from history h right outer join book b on (b.bookId = h.bid) where h.uid = #{userId}
+			 	
+		<if test="searchPrimaryKey!=null">
+            and	(b.bookType like concat ('%',#{searchPrimaryKey},'%') or	b.bookTheme like concat ('%',#{searchPrimaryKey},'%')
+            		or	b.author like concat ('%',#{searchPrimaryKey},'%')
+            			or	b.bookName like concat ('%',#{searchPrimaryKey},'%'))
+        </if>
+        	
+	</select>
+
+	<select id="getHistoryByBId" parameterType="com.springbootmybatis.entity.History"
+		resultType="com.springbootmybatis.entity.History">
+		SELECT * FROM history WHERE bId=#{bId}
+	</select>
+	
+	<select id="getHistoryByUId" parameterType="com.springbootmybatis.entity.History"
+	resultType="com.springbootmybatis.entity.History">
+		SELECT * FROM history WHERE uId=#{uId} AND returnStatus=0
+	</select>
+	
+	<select id="getBookHistory" parameterType="com.springbootmybatis.entity.History"
+	resultType="com.springbootmybatis.entity.BookHistory">
+SELECT h.borrowTime,h.remainDay,u.userName FROM history h RIGHT OUTER JOIN USER u ON (h.uId = u.userId) WHERE h.bId=#{bId};
+	</select>
+	
+	<select id="getHistoryByUIdFormat" parameterType="com.springbootmybatis.entity.History"
+		resultType="com.springbootmybatis.entity.History">
+		select h.*, b.*   from history h right outer join book b on (b.bookId = h.bid) where h.uid = #{uId} AND returnStatus=0;
+	</select>
+	
+	<insert id="addHistory" parameterType="com.springbootmybatis.entity.History">
+		INSERT INTO history(uId,bId,borrowTime,returnTime,remainDay,returnStatus) 
+		VALUES (#{uId},#{bId},#{borrowTime},#{returnTime},#{remainDay},0)
+	</insert>
+	
+	<update id="returnBook"	 parameterType="com.springbootmybatis.entity.History">
+		UPDATE history 
+		SET returnStatus=1,remainDay=0  WHERE historyId=#{historyId}
+	</update>
+	
+	<select id="getAllHistoryByUId" parameterType="com.springbootmybatis.entity.History"
+		resultType="com.springbootmybatis.entity.History">
+		SELECT * FROM history WHERE uId=#{uId}
+	</select>
+	
+	<select id="getOneHistoryByUIdAndBId" parameterType="com.springbootmybatis.entity.History"
+		resultType="com.springbootmybatis.entity.History">
+		SELECT * FROM history WHERE uId=#{uId} AND bId=#{bId} AND returnStatus=0
+	</select>
+	
+	<update id="updateRemainDay" parameterType="com.springbootmybatis.entity.History">
+		UPDATE history 
+		SET remainDay=#{remainDay} WHERE historyId=#{historyId} 
+	</update>
+	
+	<select id="getHistoryByHistoryId" parameterType="com.springbootmybatis.entity.History"
+		resultType="com.springbootmybatis.entity.History">
+		SELECT * FROM history WHERE historyId=#{historyId}
+	</select>
+	
+	<!-- 查询history数量 -->
+	<select id="getHistoriesCount" resultType="Integer">
+			select count(*) from history h right outer join book b on (b.bookId = h.bid) where h.uid = #{userId}
+			 	
+			<if test="searchPrimaryKey!=null">
+	            and	(b.bookType like concat ('%',#{searchPrimaryKey},'%') or	b.bookTheme like concat ('%',#{searchPrimaryKey},'%')
+	            		or	b.author like concat ('%',#{searchPrimaryKey},'%')
+	            			or	b.bookName like concat ('%',#{searchPrimaryKey},'%'))
+	        </if>
+		
+	</select>
+	
+	<select id="returnYearCount"	resultType="Integer">
+		SELECT count(*) FROM history WHERE year(returnTime) = year(curdate()) AND returnStatus = 1;
+	</select>
+	<select id="returnMouthCount"	resultType="Integer">
+		SELECT count(*) FROM history WHERE year(returnTime) = year(curdate()) AND month(borrowTime) = month(curdate()) AND returnStatus = 1;
+	</select>
+	<select id="returnDayCount"	resultType="Integer">
+		SELECT count(*) FROM history WHERE year(returnTime) = year(curdate()) AND month(borrowTime) = month(curdate()) AND day(borrowTime) = day(curdate()) AND returnStatus = 1;
+	</select>
+	<select id="borrowYearCount"	resultType="Integer">
+		SELECT count(*) FROM history WHERE year(borrowTime) = year(curdate());
+	</select>
+	<select id="borrowMouthCount"	resultType="Integer">
+		SELECT count(*) FROM history WHERE year(borrowTime) = year(curdate()) AND month(borrowTime) = month(curdate());
+	</select>
+	<select id="borrowDayCount"	resultType="Integer">
+		SELECT count(*) FROM history WHERE year(borrowTime) = year(curdate()) AND month(borrowTime) = month(curdate()) AND day(borrowTime) = day(curdate());
+	</select>
+	
+	<!--  -->
+	<delete id="deleteHistoryByUId">
+		delete from history where uId = #{userId}
+	</delete>
+</mapper>
